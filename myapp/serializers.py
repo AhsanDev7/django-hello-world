@@ -8,7 +8,7 @@ class BookSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class OrderSerializer(serializers.ModelSerializer):
-    books = BookSerializer(many=True, read_only=True)  # Use nested BookSerializer
+    books = BookSerializer(many=True, read_only=True)
 
     class Meta:
         model = Order
