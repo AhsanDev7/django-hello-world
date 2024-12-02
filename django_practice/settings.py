@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-j_8s$e7gcx$#b2i^w-i%(14lp)uonao@xh(4=76y9)ai7#^mh('
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = []
 
@@ -49,6 +49,13 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+]
+
+ALLOWED_HOSTS = [
+    "django-hello-world-eight-umber.vercel.app",
+    "django-hello-world-git-main-ahsandev7s-projects.vercel.app",
+    "django-hello-world-62irptmh7-ahsandev7s-projects.vercel.app",
 ]
 
 ROOT_URLCONF = 'django_practice.urls'
