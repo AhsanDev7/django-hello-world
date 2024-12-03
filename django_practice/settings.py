@@ -11,6 +11,10 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os
+from decouple import config
+import dj_database_url
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +29,12 @@ SECRET_KEY = 'django-insecure-j_8s$e7gcx$#b2i^w-i%(14lp)uonao@xh(4=76y9)ai7#^mh(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    ".vercel.app",
+     "django-hello-world-eight-umber.vercel.app",
+    "django-hello-world-git-main-ahsandev7s-projects.vercel.app",
+    "django-hello-world-62irptmh7-ahsandev7s-projects.vercel.app",
+]
 
 
 # Application definition
@@ -55,13 +64,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    "whitenoise.middleware.WhiteNoiseMiddleware",
-]
-
-ALLOWED_HOSTS = [
-    "django-hello-world-eight-umber.vercel.app",
-    "django-hello-world-git-main-ahsandev7s-projects.vercel.app",
-    "django-hello-world-62irptmh7-ahsandev7s-projects.vercel.app",
+    # "whitenoise.middleware.WhiteNoiseMiddleware",
 ]
 
 ROOT_URLCONF = 'django_practice.urls'
@@ -88,15 +91,19 @@ WSGI_APPLICATION = 'django_practice.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'practice_db',
+#         'USER': 'postgres',
+#         'PASSWORD': 'admin',
+#         'HOST': 'localhost',
+#         'PORT': '5432',
+#     }
+# }
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'practice_db',
-        'USER': 'postgres',
-        'PASSWORD': 'admin',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
+    'default': dj_database_url.parse(config('DATABASE_URL'))
 }
 
 
@@ -136,6 +143,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'assets', 'staticfiles')
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'myapp', 'static'),
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
