@@ -31,9 +31,6 @@ DEBUG = False
 
 ALLOWED_HOSTS = [
     ".vercel.app",
-     "django-hello-world-eight-umber.vercel.app",
-    "django-hello-world-git-main-ahsandev7s-projects.vercel.app",
-    "django-hello-world-62irptmh7-ahsandev7s-projects.vercel.app",
 ]
 
 

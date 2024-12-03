@@ -26,6 +26,6 @@
   "env": {
     "PYTHONPATH": "./",
     "DJANGO_SETTINGS_MODULE": "django_practice.settings",
-    "SITE_DOMAIN": "https://iux-react-app.netlify.app"
+    "SITE_DOMAIN": "https://django-hello-world-git-main-ahsandev7s-projects.vercel.app"
   }
 }
