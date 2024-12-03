@@ -10,7 +10,10 @@ https://docs.djangoproject.com/en/5.1/howto/deployment/wsgi/
 import os
 
 from django.core.wsgi import get_wsgi_application
+from whitenoise import WhiteNoise
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_practice.settings')
+static_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets", "staticfiles"))
 
-application = get_wsgi_application()
+app = get_wsgi_application()
+app = WhiteNoise(app, root=static_root)
