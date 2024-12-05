@@ -27,10 +27,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-j_8s$e7gcx$#b2i^w-i%(14lp)uonao@xh(4=76y9)ai7#^mh('
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = config('IS_DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = [
     ".vercel.app",
+    "127.0.0.1"
 ]
 
 
@@ -82,28 +83,29 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'django_practice.wsgi.application'
+WSGI_APPLICATION = 'django_practice.wsgi.app'
 
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'practice_db',
-#         'USER': 'postgres',
-#         'PASSWORD': 'admin',
-#         'HOST': 'localhost',
-#         'PORT': '5432',
-#     }
-# }
+DATABASE_URL = config('DATABASE_URL', default=None)
 
-DATABASES = {
-    'default': dj_database_url.parse(config('DATABASE_URL'))
-}
-
-
+if DATABASE_URL:
+    DATABASES = {
+        'default': dj_database_url.parse(DATABASE_URL)
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'practice_db',
+            'USER': 'postgres',
+            'PASSWORD': 'admin',
+            'HOST': 'localhost',
+            'PORT': '5432',
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators

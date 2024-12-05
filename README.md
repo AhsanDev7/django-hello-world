@@ -1,106 +1,205 @@
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fexamples%2Ftree%2Fmain%2Fpython%2Fdjango&demo-title=Django%20%2B%20Vercel&demo-description=Use%20Django%204%20on%20Vercel%20with%20Serverless%20Functions%20using%20the%20Python%20Runtime.&demo-url=https%3A%2F%2Fdjango-template.vercel.app%2F&demo-image=https://assets.vercel.com/image/upload/v1669994241/random/django.png)
+# Django Project Deployment Guide
+> A comprehensive guide for deploying Django applications using Vercel (server) and Neon.tech (database)
 
-# Django + Vercel
+## Table of Contents
+- [Database Setup with Neon.tech](#database-setup-with-neontech)
+- [Project Deployment with Vercel](#project-deployment-with-vercel)
+- [Configuration Files](#configuration-files)
+- [Troubleshooting](#troubleshooting)
 
-This example shows how to use Django 4 on Vercel with Serverless Functions using the [Python Runtime](https://vercel.com/docs/concepts/functions/serverless-functions/runtimes/python).
+## Database Setup with Neon.tech
 
-## Demo
+### Step 1: Create Neon.tech Account
+1. Visit [neon.tech](https://neon.tech)
+2. Sign up for a new account
+3. Verify your email address
 
-https://django-template.vercel.app/
+### Step 2: Database Configuration
+1. Create a New Project
+2. Navigate to QuickStart > postgres
+3. Wait for the connection string generation
+4. Copy the generated database connection string
 
-## How it Works
-
-Our Django application, `example` is configured as an installed application in `api/settings.py`:
-
-```python
-# api/settings.py
-INSTALLED_APPS = [
-    # ...
-    'example',
-]
-```
-
-We allow "\*.vercel.app" subdomains in `ALLOWED_HOSTS`, in addition to 127.0.0.1:
-
-```python
-# api/settings.py
-ALLOWED_HOSTS = ['127.0.0.1', '.vercel.app']
-```
-
-The `wsgi` module must use a public variable named `app` to expose the WSGI application:
-
-```python
-# api/wsgi.py
-app = get_wsgi_application()
-```
-
-The corresponding `WSGI_APPLICATION` setting is configured to use the `app` variable from the `api.wsgi` module:
-
-```python
-# api/settings.py
-WSGI_APPLICATION = 'api.wsgi.app'
-```
-
-There is a single view which renders the current time in `example/views.py`:
-
-```python
-# example/views.py
-from datetime import datetime
-
-from django.http import HttpResponse
-
-
-def index(request):
-    now = datetime.now()
-    html = f'''
-    <html>
-        <body>
-            <h1>Hello from Vercel!</h1>
-            <p>The current time is { now }.</p>
-        </body>
-    </html>
-    '''
-    return HttpResponse(html)
-```
-
-This view is exposed a URL through `example/urls.py`:
-
-```python
-# example/urls.py
-from django.urls import path
-
-from example.views import index
-
-
-urlpatterns = [
-    path('', index),
-]
-```
-
-Finally, it's made accessible to the Django server inside `api/urls.py`:
-
-```python
-# api/urls.py
-from django.urls import path, include
-
-urlpatterns = [
-    ...
-    path('', include('example.urls')),
-]
-```
-
-This example uses the Web Server Gateway Interface (WSGI) with Django to enable handling requests on Vercel with Serverless Functions.
-
-## Running Locally
-
+### Step 3: Django Database Configuration
+1. Install required dependencies:
 ```bash
-python manage.py runserver
+pip install psycopg2-binary dj-database-url
+pip freeze > requirements.txt
 ```
 
-Your Django application is now available at `http://localhost:8000`.
+`IMPORTANT:` Please clean up the `requirements.txt` file by removing unnecessary packages. It should only include the essential libraries/packages. Below is a sample file for reference:
 
-## One-Click Deploy
+`requirements.txt:`
 
-Deploy the example using [Vercel](https://vercel.com?utm_source=github&utm_medium=readme&utm_campaign=vercel-examples):
+```
+dj-database-url==2.3.0
+Django==5.1.3
+djangorestframework==3.15.2
+gunicorn==23.0.0
+psycopg2-binary==2.9.10
+python-dateutil
+python-decouple==3.8
+requests==2.32.3
+whitenoise==6.8.2
+```
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fexamples%2Ftree%2Fmain%2Fpython%2Fdjango&demo-title=Django%20%2B%20Vercel&demo-description=Use%20Django%204%20on%20Vercel%20with%20Serverless%20Functions%20using%20the%20Python%20Runtime.&demo-url=https%3A%2F%2Fdjango-template.vercel.app%2F&demo-image=https://assets.vercel.com/image/upload/v1669994241/random/django.png)
+2. Update your `settings.py`:
+```python
+import dj_database_url
+
+DATABASES = {
+    'default': dj_database_url.parse(
+        "your-generated-database-connection-string"
+    )
+}
+```
+
+3. Run migrations:
+```bash
+python manage.py migrate
+```
+
+## Project Deployment with Vercel
+
+### Step 1: Initial Setup
+1. Visit [Vercel's Django Template](https://vercel.com/templates/python/django-hello-world)
+2. Click "Deploy" and connect with your GitHub account
+3. Clone the newly created repository:
+```bash
+git clone <your-repo-url>
+```
+
+### Step 2: Update Repository with Existing Project
+1. Copy your existing Django project files into the cloned directory
+2. Ensure to maintain the following structure:
+   ```
+   your-project/
+   ├── your_project_name/
+   │   ├── __init__.py
+   │   ├── settings.py
+   │   ├── urls.py
+   │   └── wsgi.py
+   ├── manage.py
+   ├── requirements.txt
+   ├── vercel.json
+   └── vercel.sh
+   ```
+3. Update all file paths in configuration files to match your project name
+4. Commit and push your changes:
+   ```bash
+   git add .
+   git commit -m "Update with existing project"
+   git push origin main
+   ```
+
+### Step 3: Project Configuration
+Create or update the following configuration files in your project:
+
+1. `vercel.json`:
+```json
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "your_project_name/wsgi.py",
+      "use": "@vercel/python",
+      "config": {
+        "maxLambdaSize": "15mb",
+        "runtime": "python3.12"
+      }
+    },
+    {
+      "src": "vercel.sh",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "assets/staticfiles"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "your_project_name/wsgi.py"
+    }
+  ],
+  "env": {
+    "PYTHONPATH": "./",
+    "DJANGO_SETTINGS_MODULE": "your_project_name.settings",
+    "SITE_DOMAIN": "your-vercel-deployment-url"
+  }
+}
+```
+
+2. `vercel.sh`:
+```bash
+#!/bin/bash
+echo -e "Installing dependencies"
+python3.12 -m pip install -r requirements.txt
+
+echo -e "Applying migrations..."
+python3.12 manage.py migrate
+
+echo -e "Running custom initialization command..."
+python3.12 manage.py init
+
+echo -e "Collecting static files..."
+python3.12 manage.py collectstatic --noinput
+
+echo -e "Deployment script completed."
+```
+
+3. Update `settings.py`:
+```python
+DEBUG = False
+
+ALLOWED_HOSTS = [".vercel.app"]
+
+MIDDLEWARE = [
+    # ... existing middleware ...
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+]
+
+STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'assets', 'staticfiles')
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'your_app_name', 'static'),
+]
+
+WSGI_APPLICATION = 'your-project-name.wsgi.app'
+```
+
+4. Update `wsgi.py`:
+```python
+import os
+from django.core.wsgi import get_wsgi_application
+from whitenoise import WhiteNoise
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'your_project_name.settings')
+static_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets", "staticfiles"))
+
+app = get_wsgi_application()
+app = WhiteNoise(app, root=static_root)
+```
+
+5. Create/update `requirements.txt` with only necessary packages.
+
+### Step 3: Deployment
+1. Commit all changes to your repository:
+```bash
+git add .
+git commit -m "Deployment configuration"
+git push
+```
+
+2. Vercel will automatically detect the changes and deploy your application.
+
+## Troubleshooting
+- If static files are not loading, ensure your `STATIC_ROOT` and `STATICFILES_DIRS` paths are correct
+- For database connection issues, verify your Neon.tech connection string
+- Check Vercel deployment logs for specific error messages
+
+## Support
+For additional help:
+- [Vercel Documentation](https://vercel.com/docs)
+- [Neon.tech Documentation](https://neon.tech/docs)
+- [Django Documentation](https://docs.djangoproject.com/)
