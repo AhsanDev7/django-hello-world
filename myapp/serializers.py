@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from .models import Book, Order, Genre, Author, Publisher, Review
 from django.contrib.auth.models import User
+from djoser.serializers import UserCreateSerializer
+from django.contrib.auth.password_validation import validate_password
 
 class BookSerializer(serializers.ModelSerializer):
     class Meta:

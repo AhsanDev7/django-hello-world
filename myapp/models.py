@@ -47,6 +47,8 @@ class Book(models.Model):
     price= models.DecimalField(max_digits=10, decimal_places=2)
     stock_quantity = models.PositiveIntegerField(default=0)
     description = models.TextField(blank=True)
+    cover_photo = models.ImageField(upload_to='covers/')
+
 
     def __str__(self):
         return self.title
