@@ -10,3 +10,4 @@ python-decouple==3.8
 requests==2.32.3
 whitenoise==6.8.2
 pillow==11.0.0
+django-debug-toolbar==4.4.6
