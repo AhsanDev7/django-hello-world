@@ -10,6 +10,35 @@ class BookSerializer(serializers.ModelSerializer):
         model = Book
         fields = '__all__'
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        
+        if instance.published_date:
+            data['published_date'] = instance.published_date.strftime('%B %d, %Y')
+        
+        data['price'] = f"${instance.price:.2f}"
+        
+        if instance.publisher:
+            data['publisher'] = {
+                "id": instance.publisher.id,
+                "name": instance.publisher.name
+            }
+        
+        if instance.authors:
+            data['publisher'] = {
+                "id": instance.publisher.id,
+                "name": instance.publisher.name
+            }
+        if instance.authors.exists():
+            data['authors'] = [
+                {
+                    "id": author.id,
+                    "name": author.first_name+" "+author.last_name
+                } for author in instance.authors.all()
+            ]
+
+        return data
+
     def get_in_stock(self,obj):
         return obj.stock_quantity > 0
 
@@ -67,3 +96,19 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = '__all__'
+
+
+class BookSummarySerializer(serializers.Serializer):
+    title = serializers.CharField()
+    publisher = serializers.SerializerMethodField()
+    authors = serializers.SerializerMethodField()
+    summary = serializers.SerializerMethodField()
+
+    def get_publisher(self, obj):
+        return {"id": obj.publisher.id, "name": obj.publisher.name} if obj.publisher else None
+
+    def get_authors(self, obj):
+        return [{"id": author.id, "name": author.first_name} for author in obj.authors.all()]
+
+    def get_summary(self, obj):
+        return f"{obj.title} by {', '.join(author.first_name for author in obj.authors.all())}" if obj.authors.exists() else obj.title
