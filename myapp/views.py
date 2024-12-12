@@ -1,6 +1,7 @@
 from rest_framework import viewsets
 from rest_framework.response import Response
 from .filters import BookFilter
+from rest_framework.filters import SearchFilter
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from django_filters.rest_framework import DjangoFilterBackend
@@ -19,7 +20,7 @@ class BookViewSet(viewsets.ModelViewSet):
     parser_classes = (MultiPartParser, FormParser)
     pagination_class = CustomPagination
     search_fields = ['title', 'description']
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_class = BookFilter
 
     # Custom action for book summary
