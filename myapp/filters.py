@@ -1,4 +1,6 @@
 from datetime import timedelta, date
+import django_filters
+from .models import Book
 from django.contrib.admin import SimpleListFilter
 
 class CustomDateFilter(SimpleListFilter):
@@ -49,4 +51,32 @@ class PriceRangeFilter(SimpleListFilter):
             return queryset.filter(price__gte=20, price__lte=50)
         elif self.value() == 'expensive':
             return queryset.filter(price__gt=50)
+        return queryset
+
+class BookFilter(django_filters.FilterSet):
+    published_date = django_filters.DateFilter(field_name='published_date', lookup_expr='exact')
+    price_min = django_filters.NumberFilter(field_name='price', lookup_expr='gte')
+    price_max = django_filters.NumberFilter(field_name='price', lookup_expr='lte')
+    published_date_range = django_filters.ChoiceFilter(
+        field_name='published_date',
+        choices=[
+            ('last_7_days', 'Last 7 Days'),
+            ('this_year', 'This Year'),
+            ('today', 'Today'),
+        ],
+        method='filter_by_published_date'
+    )
+
+    class Meta:
+        model = Book
+        fields = ['published_date', 'price']
+
+    def filter_by_published_date(self, queryset, name, value):
+        today = date.today()
+        if value == 'last_7_days':
+            return queryset.filter(published_date__gte=today - timedelta(days=7))
+        elif value == 'this_year':
+            return queryset.filter(published_date__year=today.year)
+        elif value == 'today':
+            return queryset.filter(published_date=today)
         return queryset
