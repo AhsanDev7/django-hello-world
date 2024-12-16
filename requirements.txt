@@ -12,7 +12,6 @@ python-dateutil
 python-decouple==3.8
 pytest==8.3.4
 pytest-django==4.9.0
-pytest-factoryboy==2.7.0
 requests==2.32.3
 whitenoise==6.8.2
 pillow==11.0.0
