@@ -3,7 +3,7 @@ from faker import Faker
 from myapp.models import Book, Author, Publisher, Genre, OrderItem, Order
 from django.contrib.auth import get_user_model
 from factory.django import DjangoModelFactory
-
+from factory.django import Password
 fake = Faker()
 
 class UserFactory(DjangoModelFactory):
@@ -13,7 +13,7 @@ class UserFactory(DjangoModelFactory):
 
     username = factory.Faker("user_name")
     email = factory.Faker("email")
-    password = factory.PostGenerationMethodCall("set_password", "password123")
+    password = Password("password")
 
 class PublisherFactory(factory.django.DjangoModelFactory):
     class Meta:
@@ -73,26 +73,22 @@ class BookFactory(factory.django.DjangoModelFactory):
     cover_photo = factory.django.ImageField(filename="example.jpg")
     publisher = factory.SubFactory(PublisherFactory)
 
-    @factory.post_generation
-    def authors(self, create, extracted, **kwargs):
-        if not create:
-            return
-        if extracted:
-            for author in extracted:
-                self.authors.add(author)
-
-    @factory.post_generation
-    def genres(self, create, extracted, **kwargs):
-        if not create:
-            return
-        if extracted:
-            for genre in extracted:
-                self.genres.add(genre)
-
     class Params:
-        bestseller = factory.Trait(
-            stock_quantity=factory.Faker("random_int", min=500, max=1000),
-            price=30.00
+
+        with_authors = factory.Trait(
+            authors=factory.RelatedFactoryList(
+                AuthorFactory,
+                factory_related_name="books",
+                size=3
+            )
+        )
+
+        with_genres = factory.Trait(
+            genres=factory.RelatedFactoryList(
+                GenreFactory,
+                factory_related_name="book",
+                size=2
+            )
         )
 
 class OrderItemFactory(DjangoModelFactory):

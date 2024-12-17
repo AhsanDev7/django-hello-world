@@ -68,11 +68,23 @@ class Review(models.Model):
     def __str__(self):
        return f"Review by {self.user.username} for {self.book.title}"
 
+class BookAuthors(models.Model):
+    """
+    Relational table for Book and Author.
+    """
+    books = models.ForeignKey(Book, on_delete=models.CASCADE)
+    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.book.title} - {self.genre.name}"
+
+
 class BookGenre(models.Model):
     """
     Relational table for Book and Genre.
     """
-    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    books = models.ForeignKey(Book, on_delete=models.CASCADE)
     genre = models.ForeignKey(Genre, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 

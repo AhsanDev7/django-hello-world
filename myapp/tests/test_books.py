@@ -19,28 +19,6 @@ def create_books():
     """Create books with additional context using traits"""
     return BookFactory.create_batch(5, authors=[AuthorFactory(renowned=True)], genres=[GenreFactory(fiction=True)])
 
-
-@pytest.fixture
-def bestseller_books():
-    """Create bestseller books with specific traits"""
-    return BookFactory.create_batch(
-        3,
-        bestseller=True,
-        authors=[AuthorFactory(renowned=True)],
-        genres=[GenreFactory(fiction=True)],
-        publisher=PublisherFactory.create(tech_publisher=True)
-    )
-
-
-def test_book_traits(bestseller_books):
-    """Test the traits functionality"""
-    for book in bestseller_books:
-        assert book.stock_quantity >= 500
-        assert book.price > 20.00
-        assert book.publisher.name == "Tech Innovations Publishing"
-        assert book.publisher.location == "San Francisco, CA"
-
-
 @pytest.fixture
 def auth_client():
     """Fixture to authenticate the client using a user factory."""
