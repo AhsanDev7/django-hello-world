@@ -25,6 +25,12 @@ class PublisherFactory(factory.django.DjangoModelFactory):
     website = factory.Faker("url")
     contact_email = factory.Faker("email")
 
+    class Params:
+        tech_publisher = factory.Trait(
+            name="Tech Innovations Publishing",
+            location="San Francisco, CA",
+            website="https://techinnovations.com"
+        )
 
 class AuthorFactory(factory.django.DjangoModelFactory):
     class Meta:
@@ -35,10 +41,10 @@ class AuthorFactory(factory.django.DjangoModelFactory):
     nationality = factory.Faker("country")
 
     class Params:
-        famous = factory.Trait(
+        renowned = factory.Trait(
             first_name="Stephen",
             last_name="King",
-            nationality="American",
+            nationality="American"
         )
 
 
@@ -52,9 +58,8 @@ class GenreFactory(factory.django.DjangoModelFactory):
     class Params:
         fiction = factory.Trait(
             name="Fiction",
-            description="A genre that tells imaginary stories.",
+            description="A genre of imaginary stories"
         )
-
 
 class BookFactory(factory.django.DjangoModelFactory):
     class Meta:
@@ -84,6 +89,12 @@ class BookFactory(factory.django.DjangoModelFactory):
             for genre in extracted:
                 self.genres.add(genre)
 
+    class Params:
+        bestseller = factory.Trait(
+            stock_quantity=factory.Faker("random_int", min=500, max=1000),
+            price=30.00
+        )
+
 class OrderItemFactory(DjangoModelFactory):
     class Meta:
         model = OrderItem
@@ -109,8 +120,7 @@ class OrderFactory(DjangoModelFactory):
         failed = factory.Trait(
             status='F',
         )
-    
     class Params:
-        refunded = factory.Trait(
-            status='R',
+        pending = factory.Trait(
+            status='P',
         )
