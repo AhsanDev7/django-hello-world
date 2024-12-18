@@ -88,7 +88,7 @@ class BookGenreAdmin(admin.ModelAdmin):
     """
     Admin customization for the BookGenre intermediary model.
     """
-    list_display = ('book', 'genre', 'created_at')
+    list_display = ('books', 'genre', 'created_at')
     list_filter = ('genre', 'created_at')
     search_fields = ('book__title', 'genre__name')
 

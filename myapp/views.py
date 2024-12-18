@@ -11,7 +11,7 @@ from .serializers import BookSerializer, OrderSerializer,BookSummarySerializer, 
 
 
 class CustomPagination(PageNumberPagination):
-    page_size = 2
+    page_size = 5
     page_size_query_param = 'page_size'
 
 class BookViewSet(viewsets.ModelViewSet):
