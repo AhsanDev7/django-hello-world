@@ -5,6 +5,8 @@ from django.contrib.auth import get_user_model
 from factory.django import DjangoModelFactory
 from factory.django import Password
 fake = Faker()
+from django.utils.timezone import now
+from datetime import timedelta
 
 class UserFactory(DjangoModelFactory):
     class Meta:
@@ -90,6 +92,14 @@ class BookFactory(factory.django.DjangoModelFactory):
                 size=2
             )
         )
+        
+        last_7_days = factory.Trait(
+            published_date=factory.LazyFunction(lambda: now() - timedelta(days=5))
+        )
+
+        this_year = factory.Trait(
+            published_date=factory.LazyFunction(lambda: now().replace(year=2024))
+        )
 
 class OrderItemFactory(DjangoModelFactory):
     class Meta:
@@ -112,11 +122,10 @@ class OrderFactory(DjangoModelFactory):
             status='C',
         )
 
-    class Params:
         failed = factory.Trait(
             status='F',
         )
-    class Params:
+
         pending = factory.Trait(
             status='P',
         )

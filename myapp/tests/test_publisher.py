@@ -2,6 +2,7 @@ import pytest
 from myapp.models import Publisher
 from rest_framework.test import APIClient
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.urls import reverse
 from .factories import PublisherFactory, UserFactory
 
 pytestmark = pytest.mark.django_db
@@ -27,25 +28,25 @@ def auth_client():
 class TestPublisherAPI:
 
     def test_create_publisher(self, auth_client):
-        """Test creating a publisher, handling success and failure scenarios."""
+        """Test creating a publisher"""
         valid_payload = {
             "name": "Test Publisher",
             "location": "Test Location",
             "established_year": 2020,
         }
-        response = auth_client.post("/api/publisher/", valid_payload)
-        print(response)
+        url = reverse("publisher-list")
+        response = auth_client.post(url, valid_payload)
         assert response.status_code == 201
         assert response.data["name"] == valid_payload["name"]
 
         invalid_payload = {
-            "name": "", 
+            "name": "",
             "location": "Test Location",
             "established_year": "invalid_year",
             "website": "not-a-valid-url",
             "contact_email": "invalid-email",
         }
-        response = auth_client.post("/api/publisher/", invalid_payload)
+        response = auth_client.post(url, invalid_payload)
         assert response.status_code == 400
         assert "name" in response.data
         assert "established_year" in response.data
@@ -54,23 +55,24 @@ class TestPublisherAPI:
 
     def test_list_publishers(self, auth_client, create_publishers):
         """Test retrieving a list of publishers."""
-        response = auth_client.get("/api/publisher/")
+        url = reverse("publisher-list")
+        response = auth_client.get(url)
         assert response.status_code == 200
         assert len(response.data) == len(create_publishers)
 
     def test_retrieve_publisher_detail(self, auth_client):
         """Test retrieving a single publisher by ID."""
         publisher = PublisherFactory()
-        url = f"/api/publisher/{publisher.id}/"
+        url = reverse("publisher-detail", args=[publisher.id])
         response = auth_client.get(url)
         assert response.status_code == 200
         assert response.data["name"] == publisher.name
 
     def test_update_publisher(self, auth_client):
-        """Test updating a publisher, handling success and failure scenarios."""
+        """Test updating a publisher"""
         publisher = PublisherFactory()
-        url = f"/api/publisher/{publisher.id}/"
-        
+        url = reverse("publisher-detail", args=[publisher.id])
+
         valid_payload = {
             "name": "Updated Publisher",
             "location": "Updated Location",
@@ -98,13 +100,13 @@ class TestPublisherAPI:
         assert "contact_email" in response.data
 
     def test_delete_publisher(self, auth_client):
-      """Test deleting a publisher, handling success and failure scenarios."""
-      publisher = PublisherFactory()
-      print(publisher)
+        """Test deleting a publisher"""
+        publisher = PublisherFactory()
+        url = reverse("publisher-detail", args=[publisher.id])
+        response = auth_client.delete(url)
+        assert response.status_code == 204
+        assert not Publisher.objects.filter(id=publisher.id).exists()
 
-      response = auth_client.delete(f"/api/publisher/{publisher.id}/")
-      assert response.status_code == 204
-      assert not Publisher.objects.filter(id=publisher.id).exists()
-
-      response = auth_client.delete("/api/publisher/999999/")
-      assert response.status_code == 404
+        invalid_url = reverse("publisher-detail", args=[999999])
+        response = auth_client.delete(invalid_url)
+        assert response.status_code == 404

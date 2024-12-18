@@ -40,7 +40,7 @@ class Genre(models.Model):
 
 class Book(models.Model):
     title= models.CharField(max_length=100)
-    authors = models.ManyToManyField(Author, related_name='books')  # Many-to-Many
+    authors = models.ManyToManyField(Author, related_name='books',blank=True)  # Many-to-Many
     publisher = models.ForeignKey(Publisher, on_delete=models.CASCADE, related_name='books')  # One-to-Many
     genres = models.ManyToManyField(Genre, through='BookGenre', related_name='books')  # Through table for Many-to-Many
     published_date= models.DateField()
@@ -73,7 +73,7 @@ class BookAuthors(models.Model):
     Relational table for Book and Author.
     """
     books = models.ForeignKey(Book, on_delete=models.CASCADE)
-    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+    author = models.ForeignKey(Author, on_delete=models.SET_NULL, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
