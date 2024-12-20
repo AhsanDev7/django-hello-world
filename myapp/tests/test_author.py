@@ -1,7 +1,7 @@
 import pytest
 from rest_framework import status
 from myapp.models import Author
-from .factories import AuthorFactory, UserFactory
+from myapp.tests.factories import AuthorFactory, UserFactory
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.test import APIClient
 from django.urls import reverse

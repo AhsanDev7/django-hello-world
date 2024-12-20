@@ -2,7 +2,7 @@ import pytest
 from datetime import timedelta
 from django.utils import timezone
 from myapp.models import Book
-from .factories import BookFactory
+from myapp.tests.factories import BookFactory
 
 @pytest.mark.django_db
 def test_book_filters():
