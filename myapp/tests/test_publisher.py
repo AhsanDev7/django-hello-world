@@ -3,7 +3,7 @@ from myapp.models import Publisher
 from rest_framework.test import APIClient
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.urls import reverse
-from .factories import PublisherFactory, UserFactory
+from myapp.tests.factories import PublisherFactory, UserFactory
 
 pytestmark = pytest.mark.django_db
 
