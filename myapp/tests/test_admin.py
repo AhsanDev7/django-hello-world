@@ -1,7 +1,6 @@
 import pytest
 from datetime import date, timedelta
 from django.urls import reverse
-from myapp.models import Book
 from myapp.tests.factories import BookFactory
 
 @pytest.mark.django_db

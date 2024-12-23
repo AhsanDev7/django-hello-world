@@ -150,7 +150,6 @@ def test_filter_books_by_published_date(auth_client, create_books):
     assert len(response.data["results"]) == 3
 
     response = auth_client.get(reverse('book-list') + "?published_date_range=last_7_days")
-    print(f"response: {response}")
     assert response.status_code == 200
     assert len(response.data["results"]) == 5
 
