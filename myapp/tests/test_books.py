@@ -1,5 +1,7 @@
 import os
 import pytest
+from unittest import mock
+import requests
 from myapp.models import Book
 from django.conf import settings
 from rest_framework.test import APIClient
@@ -202,3 +204,51 @@ def test_combined_filters(auth_client):
     assert response.status_code == 200
     assert len(response.data["results"]) == 1
     assert response.data["results"][0]["title"] == "Advanced Django"
+
+@pytest.fixture
+def mock_open_library_response(mocker):
+    """Fixture to mock the Open Library API response."""
+    mock_response =  {
+        "numFound": 2553,
+        "start": 0,
+        "numFoundExact": True,
+        "docs": [
+            {
+                "author_name": ["Test Author"],
+                "key": "/works/OL166894W",
+                "title": "Crime and Punishment",
+                "editions": {
+                    "numFound": 291,
+                    "start": 0,
+                    "numFoundExact": True,
+                    "docs": [
+                        {
+                            "key": "/books/OL37044740M",
+                            "title": "Crime and Punishment",
+                            "description": "<p><i>Crime and Punishment</i> tells the story of Rodion Raskolnikov...</p>",
+                        }
+                    ],
+                },
+            }
+        ],
+    }
+    
+    return mocker.patch("requests.get", return_value=mock.Mock(status_code=200, json=lambda: mock_response))
+
+def test_open_library_search(mock_open_library_response, auth_client):
+    """Test the custom 'open_library' action with mocked API call."""
+    query = "test"
+    
+    response = auth_client.get(reverse("book-open-library") + f"?query={query}")
+    
+    assert response.status_code == 200
+    assert "Test Author" in response.data["docs"][0]["author_name"]
+    assert response.data["docs"][0]["title"] == "Crime and Punishment"
+    assert "editions" in response.data["docs"][0]
+    assert response.data["docs"][0]["editions"]["docs"][0]["title"] == "Crime and Punishment"
+    
+def test_open_library_missing_query(auth_client):
+    """Test the 'open_library' action when the query parameter is missing."""
+    response = auth_client.get(reverse("book-open-library"))
+    assert response.status_code == 400
+    assert response.data["error"] == "Query parameter is required."
