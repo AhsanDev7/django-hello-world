@@ -9,8 +9,8 @@ from django.urls import reverse
 from datetime import timedelta, date
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.core.files.uploadedfile import SimpleUploadedFile
+from myapp.tests.test_mocks import mock_open_library_response_data
 from myapp.tests.factories import BookFactory, AuthorFactory, GenreFactory, PublisherFactory, UserFactory
-
 pytestmark = pytest.mark.django_db
 
 @pytest.fixture
@@ -208,38 +208,31 @@ def test_combined_filters(auth_client):
 @pytest.fixture
 def mock_open_library_response(mocker):
     """Fixture to mock the Open Library API response."""
-    mock_response =  {
-        "numFound": 2553,
-        "start": 0,
-        "numFoundExact": True,
-        "docs": [
-            {
-                "author_name": ["Test Author"],
-                "key": "/works/OL166894W",
-                "title": "Crime and Punishment",
-                "editions": {
-                    "numFound": 291,
-                    "start": 0,
-                    "numFoundExact": True,
-                    "docs": [
-                        {
-                            "key": "/books/OL37044740M",
-                            "title": "Crime and Punishment",
-                            "description": "<p><i>Crime and Punishment</i> tells the story of Rodion Raskolnikov...</p>",
-                        }
-                    ],
-                },
-            }
-        ],
-    }
-    
-    return mocker.patch("requests.get", return_value=mock.Mock(status_code=200, json=lambda: mock_response))
 
-def test_open_library_search(mock_open_library_response, auth_client):
-    """Test the custom 'open_library' action with mocked API call."""
-    query = "test"
+    return mocker.patch("requests.get", return_value=mock.Mock(status_code=200, json=lambda: mock_open_library_response_data))
+
+@pytest.fixture
+def existing_book(db):
+    """Fixture to create an existing book in the database."""
+    return BookFactory.create(title="Test Book ____ 1100", price=10.00, published_date=date.today())
+
+
+def test_update_description(mock_open_library_response, auth_client, existing_book):
+    """Test that the 'update_description' action updates the description of a book."""
+    response = auth_client.get(reverse("book-update-description", kwargs={"pk": existing_book.id}))
     
-    response = auth_client.get(reverse("book-open-library") + f"?query={query}")
+    assert response.status_code == 200
+    assert response.data["message"] == "Description updated successfully."
+
+    existing_book.refresh_from_db()
+    assert existing_book.description.startswith("<p><i>Crime and Punishment</i> tells the story")
+
+
+def test_search_details(mock_open_library_response, auth_client):
+    """Test the custom 'open_library' action with mocked API call."""
+    query = "Crime and Punishment"
+    
+    response = auth_client.get(reverse("book-search-details") + f"?query={query}")
     
     assert response.status_code == 200
     assert "Test Author" in response.data["docs"][0]["author_name"]
@@ -249,6 +242,6 @@ def test_open_library_search(mock_open_library_response, auth_client):
     
 def test_open_library_missing_query(auth_client):
     """Test the 'open_library' action when the query parameter is missing."""
-    response = auth_client.get(reverse("book-open-library"))
+    response = auth_client.get(reverse("book-search-details"))
     assert response.status_code == 400
     assert response.data["error"] == "Query parameter is required."
